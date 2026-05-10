@@ -90,7 +90,22 @@ export async function action({ request, context }: ActionFunctionArgs) {
     });
 
     // Graph edges will be populated by a separate cron job (v1.2)
-  } else {
+  } else if (threats.length > 0) {
+    // Auto-flag dangerous skills
+    const flagId = `auto-${Date.now()}`;
+    await env.DB.prepare(
+      "INSERT OR IGNORE INTO flagged_skills (id, git_url, name, reason, threats, flagged_at) VALUES (?, ?, ?, ?, ?, ?)"
+    ).bind(
+      flagId,
+      git_url,
+      metadata?.name || "Unknown",
+      threats.slice(0, 3).join("; ").slice(0, 500),
+      JSON.stringify(threats.slice(0, 5)),
+      new Date().toISOString().split("T")[0]
+    ).run();
+  }
+
+  if (!safe) {
     // For failed scans, still need a skill_id for version tracking
     const existing = await env.DB
       .prepare("SELECT id FROM skills WHERE git_url = ?")

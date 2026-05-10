@@ -51,6 +51,7 @@ function Header() {
         <nav className="flex items-center gap-6">
           <NavLink to="/" className={linkClass} end>Home</NavLink>
           <NavLink to="/skills" className={linkClass}>Skills</NavLink>
+          <NavLink to="/flagged" className={linkClass}>Unverified</NavLink>
           <NavLink to="/submit" className={linkClass}>Submit</NavLink>
           <NavLink to="/about" className={linkClass}>About</NavLink>
         </nav>
