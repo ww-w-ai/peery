@@ -1,0 +1,44 @@
+name: Scan Agent/Skill
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_url:
+        description: "Git repository URL to scan"
+        required: true
+        type: string
+      sha:
+        description: "Commit SHA to scan"
+        required: true
+        type: string
+      callback_url:
+        description: "URL to POST results to"
+        required: true
+        type: string
+
+concurrency:
+  group: scan-${{ github.event.inputs.git_url }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run scan
+        run: npx tsx actions/run-scan.ts
+        env:
+          INPUT_GIT_URL: ${{ github.event.inputs.git_url }}
+          INPUT_SHA: ${{ github.event.inputs.sha }}
+          INPUT_CALLBACK_URL: ${{ github.event.inputs.callback_url }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}

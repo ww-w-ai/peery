@@ -1,0 +1,7 @@
+.ww-w-ai/
+.bkit/
+.claude/
+node_modules/
+.env
+.env.*
+.dev.vars

@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@theme {
+  --color-peery-orange: #F97316;
+  --color-peery-dark: #1A1A2E;
+  --color-peery-navy: #16213E;
+  --color-peery-accent: #0F3460;
+  --color-peery-gold: #E94560;
+}

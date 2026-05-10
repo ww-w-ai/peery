@@ -1,0 +1,324 @@
+[
+  {
+    "id": "DEST-001",
+    "category": "destructive_commands",
+    "pattern": "rm\\s+(-[rRf]+\\s+|--recursive|--force).*(/|\\*|~|\\$HOME)",
+    "severity": "critical",
+    "description": "Recursive/forced file deletion targeting broad paths"
+  },
+  {
+    "id": "DEST-002",
+    "category": "destructive_commands",
+    "pattern": "DROP\\s+(TABLE|DATABASE|SCHEMA|INDEX)",
+    "severity": "critical",
+    "description": "SQL destructive DDL commands"
+  },
+  {
+    "id": "DEST-003",
+    "category": "destructive_commands",
+    "pattern": "git\\s+push\\s+--force",
+    "severity": "high",
+    "description": "Force push can overwrite remote history"
+  },
+  {
+    "id": "DEST-004",
+    "category": "destructive_commands",
+    "pattern": "terraform\\s+destroy",
+    "severity": "critical",
+    "description": "Infrastructure destruction command"
+  },
+  {
+    "id": "DEST-005",
+    "category": "destructive_commands",
+    "pattern": ":(\\s*){\\s*:\\s*\\|\\s*:\\s*&\\s*}\\s*;\\s*:",
+    "severity": "critical",
+    "description": "Fork bomb pattern"
+  },
+  {
+    "id": "DEST-006",
+    "category": "destructive_commands",
+    "pattern": "mkfs\\.|format\\s+[A-Z]:",
+    "severity": "critical",
+    "description": "Filesystem format commands"
+  },
+  {
+    "id": "DEST-007",
+    "category": "destructive_commands",
+    "pattern": "dd\\s+if=.*of=/dev/",
+    "severity": "critical",
+    "description": "Direct disk write (dd to device)"
+  },
+  {
+    "id": "EXFIL-001",
+    "category": "data_exfiltration",
+    "pattern": "(curl|wget|fetch|http\\.get|axios|request)\\s*\\(?\\s*['\"`]https?://(?!localhost|127\\.0\\.0\\.1)",
+    "severity": "high",
+    "description": "HTTP request to external URL"
+  },
+  {
+    "id": "EXFIL-002",
+    "category": "data_exfiltration",
+    "pattern": "webhook[s]?[._/]",
+    "severity": "medium",
+    "description": "Webhook URL reference (potential data relay)"
+  },
+  {
+    "id": "EXFIL-003",
+    "category": "data_exfiltration",
+    "pattern": "ngrok|localtunnel|bore\\.pub|cloudflared\\s+tunnel",
+    "severity": "high",
+    "description": "Tunnel service usage (exposes local to internet)"
+  },
+  {
+    "id": "EXFIL-004",
+    "category": "data_exfiltration",
+    "pattern": "(dns|icmp).*exfil|exfiltrat",
+    "severity": "critical",
+    "description": "Explicit exfiltration terminology in code"
+  },
+  {
+    "id": "EXFIL-005",
+    "category": "data_exfiltration",
+    "pattern": "\\bFormData\\b.*append.*\\b(token|key|secret|password|credential)",
+    "severity": "high",
+    "description": "Sensitive data appended to form for upload"
+  },
+  {
+    "id": "SECRET-001",
+    "category": "secret_theft",
+    "pattern": "process\\.env\\[?['\"]?(AWS_SECRET|GITHUB_TOKEN|API_KEY|DATABASE_URL|OPENAI_API_KEY)",
+    "severity": "high",
+    "description": "Reading known sensitive environment variables"
+  },
+  {
+    "id": "SECRET-002",
+    "category": "secret_theft",
+    "pattern": "readFile[Ss]ync?\\s*\\([^)]*(\\.env|\\.ssh|credentials|id_rsa|id_ed25519)",
+    "severity": "critical",
+    "description": "Reading secret files (.env, SSH keys, credentials)"
+  },
+  {
+    "id": "SECRET-003",
+    "category": "secret_theft",
+    "pattern": "keychain|credential[_-]?store|pass(word)?[_-]?manager",
+    "severity": "high",
+    "description": "Accessing system credential stores"
+  },
+  {
+    "id": "SECRET-004",
+    "category": "secret_theft",
+    "pattern": "\\b(AKIA|ASIA)[A-Z0-9]{16}\\b",
+    "severity": "critical",
+    "description": "Hardcoded AWS access key pattern"
+  },
+  {
+    "id": "SECRET-005",
+    "category": "secret_theft",
+    "pattern": "(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9_]{36,}",
+    "severity": "critical",
+    "description": "Hardcoded GitHub token pattern"
+  },
+  {
+    "id": "SECRET-006",
+    "category": "secret_theft",
+    "pattern": "sk-[A-Za-z0-9]{20,}",
+    "severity": "critical",
+    "description": "Hardcoded OpenAI/Stripe-style secret key"
+  },
+  {
+    "id": "INJECT-001",
+    "category": "prompt_injection",
+    "pattern": "[\\u200b\\u200c\\u200d\\u2060\\ufeff]",
+    "severity": "critical",
+    "description": "Zero-width characters (hidden text injection)"
+  },
+  {
+    "id": "INJECT-002",
+    "category": "prompt_injection",
+    "pattern": "atob\\s*\\(|Buffer\\.from\\([^)]+,\\s*['\"]base64['\"]",
+    "severity": "high",
+    "description": "Base64 decoding (potential hidden instructions)"
+  },
+  {
+    "id": "INJECT-003",
+    "category": "prompt_injection",
+    "pattern": "\\\\u[0-9a-fA-F]{4}.*\\\\u[0-9a-fA-F]{4}.*\\\\u[0-9a-fA-F]{4}",
+    "severity": "medium",
+    "description": "Multiple unicode escapes (possible obfuscated payload)"
+  },
+  {
+    "id": "INJECT-004",
+    "category": "prompt_injection",
+    "pattern": "(ignore|disregard|forget)\\s+(previous|above|all|prior)\\s+(instructions|rules|prompts)",
+    "severity": "critical",
+    "description": "Explicit prompt injection attempt"
+  },
+  {
+    "id": "INJECT-005",
+    "category": "prompt_injection",
+    "pattern": "system\\s*prompt|<\\|im_start\\|>|<\\|im_end\\|>|\\[INST\\]|<<SYS>>",
+    "severity": "critical",
+    "description": "LLM control tokens in user content"
+  },
+  {
+    "id": "OBFUSC-001",
+    "category": "obfuscated_code",
+    "pattern": "\\beval\\s*\\(",
+    "severity": "high",
+    "description": "Dynamic code execution (security note: this is a DETECTION pattern for scanning third-party code, not a usage of eval in Peery itself)"
+  },
+  {
+    "id": "OBFUSC-002",
+    "category": "obfuscated_code",
+    "pattern": "\\bexec\\s*\\(|\\bexecSync\\s*\\(",
+    "severity": "high",
+    "description": "Shell command execution"
+  },
+  {
+    "id": "OBFUSC-003",
+    "category": "obfuscated_code",
+    "pattern": "Function\\s*\\(\\s*['\"]",
+    "severity": "high",
+    "description": "Dynamic function construction from string"
+  },
+  {
+    "id": "OBFUSC-004",
+    "category": "obfuscated_code",
+    "pattern": "\\bString\\.fromCharCode\\s*\\(.*,.*,.*,",
+    "severity": "high",
+    "description": "Character code assembly (obfuscation technique)"
+  },
+  {
+    "id": "OBFUSC-005",
+    "category": "obfuscated_code",
+    "pattern": "require\\s*\\(\\s*[^'\"`]|import\\s*\\(\\s*[^'\"`]",
+    "severity": "medium",
+    "description": "Dynamic require/import with variable (not string literal)"
+  },
+  {
+    "id": "OBFUSC-006",
+    "category": "obfuscated_code",
+    "pattern": "\\[\\s*['\"]constructor['\"]\\s*\\]\\s*\\(|\\[\\s*['\"]__proto__['\"]\\s*\\]",
+    "severity": "critical",
+    "description": "Prototype pollution or constructor access via bracket notation"
+  },
+  {
+    "id": "OBFUSC-007",
+    "category": "obfuscated_code",
+    "pattern": "\\b(compile|vm\\.runIn|vm\\.Script|child_process)\\b",
+    "severity": "high",
+    "description": "Node.js dangerous module usage"
+  },
+  {
+    "id": "FILE-001",
+    "category": "abnormal_file_access",
+    "pattern": "(\\$HOME|~|/home/|/Users/|/root/|C:\\\\Users\\\\)",
+    "severity": "medium",
+    "description": "Home directory path reference"
+  },
+  {
+    "id": "FILE-002",
+    "category": "abnormal_file_access",
+    "pattern": "\\.ssh[/\\\\]|id_rsa|id_ed25519|known_hosts|authorized_keys",
+    "severity": "critical",
+    "description": "SSH key/config file access"
+  },
+  {
+    "id": "FILE-003",
+    "category": "abnormal_file_access",
+    "pattern": "/etc/(passwd|shadow|hosts|sudoers)",
+    "severity": "critical",
+    "description": "System sensitive file access"
+  },
+  {
+    "id": "FILE-004",
+    "category": "abnormal_file_access",
+    "pattern": "\\.aws[/\\\\](credentials|config)|\\baws\\s+configure\\b",
+    "severity": "critical",
+    "description": "AWS credentials file access"
+  },
+  {
+    "id": "FILE-005",
+    "category": "abnormal_file_access",
+    "pattern": "\\.kube[/\\\\]config|\\.docker[/\\\\]config\\.json",
+    "severity": "high",
+    "description": "Container/orchestration config access"
+  },
+  {
+    "id": "FILE-006",
+    "category": "abnormal_file_access",
+    "pattern": "\\.gitconfig|\\.git-credentials|\\.netrc",
+    "severity": "high",
+    "description": "Git credential file access"
+  },
+  {
+    "id": "FILE-007",
+    "category": "abnormal_file_access",
+    "pattern": "\\.(bash_history|zsh_history|history)",
+    "severity": "medium",
+    "description": "Shell history access (may contain secrets)"
+  },
+  {
+    "id": "NET-001",
+    "category": "network_abuse",
+    "pattern": "\\blisten\\s*\\(.*\\b(0\\.0\\.0\\.0|INADDR_ANY)\\b",
+    "severity": "medium",
+    "description": "Binding to all interfaces (network exposure)"
+  },
+  {
+    "id": "NET-002",
+    "category": "network_abuse",
+    "pattern": "reverse.?shell|bind.?shell|meterpreter|payload",
+    "severity": "critical",
+    "description": "Reverse/bind shell terminology"
+  },
+  {
+    "id": "NET-003",
+    "category": "network_abuse",
+    "pattern": "\\bnet\\.Socket\\b.*connect|\\bSocket\\b.*\\bconnect\\b",
+    "severity": "medium",
+    "description": "Raw socket connection (non-HTTP networking)"
+  },
+  {
+    "id": "PRIV-001",
+    "category": "privilege_escalation",
+    "pattern": "\\bsudo\\b|\\bchmod\\s+[47]|\\bchown\\s+root",
+    "severity": "high",
+    "description": "Privilege escalation commands"
+  },
+  {
+    "id": "PRIV-002",
+    "category": "privilege_escalation",
+    "pattern": "setuid|setgid|capabilities|cap_sys_admin",
+    "severity": "critical",
+    "description": "Unix privilege manipulation"
+  },
+  {
+    "id": "PERSIST-001",
+    "category": "persistence",
+    "pattern": "cron(tab)?\\s+|systemctl\\s+(enable|start)|launchctl\\s+load",
+    "severity": "high",
+    "description": "Persistence mechanism (scheduled tasks/services)"
+  },
+  {
+    "id": "PERSIST-002",
+    "category": "persistence",
+    "pattern": "\\.(bashrc|zshrc|profile|bash_profile)\\b.*>>|>>.*\\.(bashrc|zshrc)",
+    "severity": "high",
+    "description": "Shell startup file modification (persistence)"
+  },
+  {
+    "id": "CRYPTO-001",
+    "category": "crypto_abuse",
+    "pattern": "crypto[_-]?min(er|ing)|xmrig|stratum\\+tcp|coinhive",
+    "severity": "critical",
+    "description": "Cryptocurrency mining indicators"
+  },
+  {
+    "id": "CRYPTO-002",
+    "category": "crypto_abuse",
+    "pattern": "\\b(bitcoin|ethereum|monero)\\b.*\\b(address|wallet)\\b",
+    "severity": "high",
+    "description": "Cryptocurrency wallet references in agent code"
+  }
+]

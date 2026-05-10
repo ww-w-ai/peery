@@ -1,0 +1,19 @@
+name = "peery"
+compatibility_date = "2025-05-01"
+pages_build_output_dir = "./build/client"
+
+[vars]
+ENVIRONMENT = "production"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "peery-db"
+database_id = "placeholder-replace-after-create"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "placeholder-replace-after-create"
+
+[[queues.producers]]
+queue = "scan-jobs"
+binding = "SCAN_QUEUE"
