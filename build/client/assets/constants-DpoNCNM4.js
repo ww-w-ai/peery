@@ -1,1 +1,0 @@
-const t=["code-generation","debugging","testing","documentation","devops","data-analysis","writing","design","security","productivity","research","infrastructure","ai-agents","communication","education"],e=["claude-code","chatgpt","cursor","windsurf","copilot","generic"];export{t as C,e as P};
