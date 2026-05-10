@@ -31,7 +31,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
       id: s.id,
       name: s.name,
       summary: s.summary,
-      category: s.category,
+      categories: s.categories,
       platforms: s.platforms,
       score: s.score,
       github_stars: s.github_stars,

@@ -32,15 +32,10 @@ async function fetchAwesomeListUrls(repo: string): Promise<string[]> {
   return [...new Set(githubUrls)].slice(0, 30);
 }
 
-const SEED_SECRET = process.env.PEERY_CALLBACK_SECRET || "";
-
 async function submitToPerey(gitUrl: string): Promise<void> {
   const res = await fetch(`${PEERY_API_URL}/api/submit`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Peery-Seed": SEED_SECRET,
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ git_url: gitUrl }),
   });
   if (res.ok) {

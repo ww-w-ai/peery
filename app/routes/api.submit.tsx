@@ -20,13 +20,9 @@ export async function action({ request, context }: ActionFunctionArgs) {
   }
 
   const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "unknown";
-  const isSeed = request.headers.get("X-Peery-Seed") === env.PEERY_CALLBACK_SECRET;
-
-  if (!isSeed) {
-    const { allowed, remaining } = await checkRateLimit(env.KV, ip);
-    if (!allowed) {
-      return errorResponse("RATE_LIMITED", "Maximum 5 submissions per day.", 429);
-    }
+  const { allowed } = await checkRateLimit(env.KV, ip);
+  if (!allowed) {
+    return errorResponse("RATE_LIMITED", "Rate limit reached.", 429);
   }
 
   let body: { git_url?: string; tag?: string };

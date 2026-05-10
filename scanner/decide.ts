@@ -41,10 +41,9 @@ function mergeMetadata(primary: LLMResult | null, secondary: LLMResult | null): 
       maintenance: Math.round((primary.score.maintenance + secondary.score.maintenance) / 2),
       uniqueness: Math.round((primary.score.uniqueness + secondary.score.uniqueness) / 2),
     },
-    // Merge unique items from both
-    similar_to: [...new Set([...primary.similar_to, ...secondary.similar_to])],
-    extends: [...new Set([...primary.extends, ...secondary.extends])],
-    depends_on: [...new Set([...primary.depends_on, ...secondary.depends_on])],
+    categories: [...new Set([...primary.categories, ...secondary.categories])].slice(0, 3),
+    use_cases: [...new Set([...primary.use_cases, ...secondary.use_cases])].slice(0, 5),
+    example_prompts: [...new Set([...primary.example_prompts, ...secondary.example_prompts])].slice(0, 3),
   };
 }
 

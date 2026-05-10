@@ -80,7 +80,7 @@ export async function setCachedBadge(
 export async function checkRateLimit(
   kv: KVNamespace,
   ip: string,
-  maxPerDay: number = 5
+  maxPerDay: number = 10000
 ): Promise<{ allowed: boolean; remaining: number }> {
   const key = `ratelimit:${ip}:${new Date().toISOString().split("T")[0]}`;
   const current = await kv.get(key, "text");

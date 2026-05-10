@@ -19,7 +19,7 @@ export interface SkillRow {
   name: string;
   summary: string;
   deep_review: string;
-  category: string;
+  category: string; // JSON array stored as string, e.g. '["ai-agents","productivity"]'
   use_cases: string;
   when_to_use: string;
   how_to_use: string;
@@ -79,7 +79,7 @@ export async function upsertSkill(
     name: string;
     summary: string;
     deep_review: string;
-    category: string;
+    category: string; // JSON array stored as string, e.g. '["ai-agents","productivity"]'
     use_cases: string[];
     when_to_use: string;
     how_to_use: string;
@@ -254,8 +254,8 @@ export async function querySkills(
   const bindParams: unknown[] = [];
 
   if (category) {
-    conditions.push("category = ?");
-    bindParams.push(category);
+    conditions.push("category LIKE ?");
+    bindParams.push(`%"${category}"%`);
   }
   if (platform) {
     conditions.push("platforms LIKE ?");

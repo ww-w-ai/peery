@@ -16,18 +16,19 @@ export interface LLMResult {
   safe: boolean;
   threats: string[];
   name: string;
+  type: "skill" | "agent" | "plugin" | "mcp-server" | "framework";
   summary: string;
   deep_review: string;
-  category: string;
+  categories: string[];
   use_cases: string[];
   when_to_use: string;
   how_to_use: string;
+  install_command: string;
+  example_prompts: string[];
   platforms: string[];
+  compatible_models: string[];
   setup_complexity: "low" | "medium" | "high";
   requires: string[];
-  similar_to: string[];
-  extends: string[];
-  depends_on: string[];
   highlights: string[];
   score: LLMScore;
 }
@@ -142,20 +143,19 @@ function parseAndValidateLLMResponse(text: string): LLMResult {
     safe: typeof parsed.safe === "boolean" ? parsed.safe : false,
     threats: Array.isArray(parsed.threats) ? parsed.threats : [],
     name: typeof parsed.name === "string" ? parsed.name : "Unknown",
+    type: ["skill", "agent", "plugin", "mcp-server", "framework"].includes(parsed.type) ? parsed.type : "skill",
     summary: typeof parsed.summary === "string" ? parsed.summary : "",
     deep_review: typeof parsed.deep_review === "string" ? parsed.deep_review : "",
-    category: typeof parsed.category === "string" ? parsed.category : "other",
+    categories: Array.isArray(parsed.categories) ? parsed.categories.slice(0, 3) : (typeof parsed.category === "string" ? [parsed.category] : ["other"]),
     use_cases: Array.isArray(parsed.use_cases) ? parsed.use_cases.slice(0, 5) : [],
     when_to_use: typeof parsed.when_to_use === "string" ? parsed.when_to_use : "",
     how_to_use: typeof parsed.how_to_use === "string" ? parsed.how_to_use : "",
+    install_command: typeof parsed.install_command === "string" ? parsed.install_command : "",
+    example_prompts: Array.isArray(parsed.example_prompts) ? parsed.example_prompts.slice(0, 3) : [],
     platforms: Array.isArray(parsed.platforms) ? parsed.platforms : [],
-    setup_complexity: ["low", "medium", "high"].includes(parsed.setup_complexity)
-      ? parsed.setup_complexity
-      : "medium",
+    compatible_models: Array.isArray(parsed.compatible_models) ? parsed.compatible_models : [],
+    setup_complexity: ["low", "medium", "high"].includes(parsed.setup_complexity) ? parsed.setup_complexity : "medium",
     requires: Array.isArray(parsed.requires) ? parsed.requires : [],
-    similar_to: Array.isArray(parsed.similar_to) ? parsed.similar_to : [],
-    extends: Array.isArray(parsed.extends) ? parsed.extends : [],
-    depends_on: Array.isArray(parsed.depends_on) ? parsed.depends_on : [],
     highlights: Array.isArray(parsed.highlights) ? parsed.highlights.slice(0, 3) : [],
     score: {
       usefulness: clampScore(parsed.score?.usefulness),

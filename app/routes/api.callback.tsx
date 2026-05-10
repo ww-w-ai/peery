@@ -6,7 +6,7 @@
 
 import type { ActionFunctionArgs } from "react-router";
 import type { Env } from "~/lib/db.server";
-import { upsertSkill, insertVersion, insertScanLog, insertGraphEdges } from "~/lib/db.server";
+import { upsertSkill, insertVersion, insertScanLog } from "~/lib/db.server";
 import { setCachedVerification } from "~/lib/kv.server";
 import { jsonResponse, errorResponse } from "~/lib/utils";
 
@@ -18,18 +18,19 @@ interface CallbackPayload {
   threats: string[];
   metadata: {
     name: string;
+    type: string;
     summary: string;
     deep_review: string;
-    category: string;
+    categories: string[];
     use_cases: string[];
     when_to_use: string;
     how_to_use: string;
+    install_command: string;
+    example_prompts: string[];
     platforms: string[];
+    compatible_models: string[];
     setup_complexity: "low" | "medium" | "high";
     requires: string[];
-    similar_to: string[];
-    extends: string[];
-    depends_on: string[];
     highlights: string[];
     score: { usefulness: number; documentation: number; maintenance: number; uniqueness: number };
   };
@@ -76,7 +77,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       name: metadata.name || "Unknown",
       summary: metadata.summary || "",
       deep_review: metadata.deep_review || "",
-      category: metadata.category || "other",
+      category: JSON.stringify(metadata.categories || ["other"]),
       use_cases: metadata.use_cases || [],
       when_to_use: metadata.when_to_use || "",
       how_to_use: metadata.how_to_use || "",
@@ -88,14 +89,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       github_stars: 0, // Will be updated by separate process
     });
 
-    // Insert graph edges
-    await insertGraphEdges(
-      env.DB,
-      skillId,
-      metadata.similar_to || [],
-      metadata.extends || [],
-      metadata.depends_on || []
-    );
+    // Graph edges will be populated by a separate cron job (v1.2)
   } else {
     // For failed scans, still need a skill_id for version tracking
     const existing = await env.DB

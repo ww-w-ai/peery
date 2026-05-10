@@ -66,7 +66,7 @@ export function formatSkillForApi(row: Record<string, unknown>) {
     name: row.name,
     summary: row.summary,
     deep_review: row.deep_review,
-    category: row.category,
+    categories: parseJsonField(row.category as string) || [row.category],
     use_cases: parseJsonField(row.use_cases as string),
     when_to_use: row.when_to_use,
     how_to_use: row.how_to_use,

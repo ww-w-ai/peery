@@ -31,18 +31,19 @@ You MUST respond with ONLY a valid JSON object matching this exact schema. No ma
   "safe": boolean,
   "threats": string[],
   "name": string,
+  "type": "skill" | "agent" | "plugin" | "mcp-server" | "framework",
   "summary": string,
   "deep_review": string,
-  "category": string,
+  "categories": string[],
   "use_cases": string[],
   "when_to_use": string,
   "how_to_use": string,
+  "install_command": string,
+  "example_prompts": string[],
   "platforms": string[],
+  "compatible_models": string[],
   "setup_complexity": "low" | "medium" | "high",
   "requires": string[],
-  "similar_to": string[],
-  "extends": string[],
-  "depends_on": string[],
   "highlights": string[],
   "score": { "usefulness": 1-10, "documentation": 1-10, "maintenance": 1-10, "uniqueness": 1-10 }
 }
@@ -55,35 +56,65 @@ You MUST respond with ONLY a valid JSON object matching this exact schema. No ma
 - **name**: human-readable name of the skill
 - **summary**: one-sentence description of what this skill does
 - **deep_review**: ~300 words covering: unique technology used, standout features, ideal use cases, setup requirements. Write for a developer evaluating whether to install this skill.
-- **category**: one of: code-generation, testing, security, devops, data, api, documentation, productivity, ai-tools, monitoring, deployment, other
+- **type**: what kind of artifact this is
+- **categories**: array of 1-3 tags from the categories list below. Pick ALL that apply. Never use "other" if any specific category fits.
 - **use_cases**: up to 5 specific scenarios where this skill excels
 - **when_to_use**: describe the situation where a developer should reach for this skill
 - **how_to_use**: brief setup and usage guide
-- **platforms**: which platforms this works on (e.g., claude-code, cursor, mcp, openai, vercel, mastra)
+- **install_command**: the exact command to install (e.g., "npx skills add owner/repo", "pip install name", "npm install name")
+- **example_prompts**: 2-3 example prompts a user would give to an AI agent to use this skill effectively
+- **platforms**: which platforms this works on (claude-code, cursor, codex, copilot, windsurf, gemini, openclaw, cline, etc.)
+- **compatible_models**: which LLMs this works best with (claude, gpt, gemini, llama, etc.)
 - **setup_complexity**: low (copy-paste), medium (config needed), high (infrastructure required)
 - **requires**: dependencies or prerequisites (e.g., "Node.js 18+", "GitHub account")
-- **similar_to**: names of similar/alternative skills (for graph relationships)
-- **extends**: skills this builds upon or enhances
-- **depends_on**: hard dependencies on other skills
 - **highlights**: max 3 standout features (short phrases)
 - **score**: 1-10 ratings on four dimensions
 
-## Categories Reference
+## Categories Reference (pick 1-3, multi-tag)
 
+### Primary (16)
 | Category | Description |
 |----------|-------------|
-| code-generation | Writes or transforms code |
-| testing | Test generation, running, coverage |
-| security | Security scanning, auditing |
-| devops | CI/CD, deployment, infrastructure |
-| data | Data processing, transformation |
-| api | API clients, integrations |
-| documentation | Doc generation, maintenance |
-| productivity | Workflow automation, shortcuts |
-| ai-tools | LLM utilities, prompt tools |
-| monitoring | Logging, alerting, observability |
-| deployment | Deploy scripts, hosting |
-| other | Does not fit above categories |
+| developer-tools | IDE integration, CLI tools, code generation, refactoring, linting |
+| web-frontend | React, Next.js, Vue, CSS, UI components, design systems |
+| backend-apis | REST, GraphQL, server frameworks, middleware |
+| databases | SQL, NoSQL, ORM, migrations, vector DBs |
+| cloud-infrastructure | AWS, GCP, Azure, Terraform, Docker, Kubernetes |
+| devops-cicd | Deployment, pipelines, CI/CD, containers |
+| security | Scanning, pentesting, secrets management, compliance |
+| ai-llm | Model integration, RAG, embeddings, prompt engineering, agent orchestration |
+| browser-automation | Scraping, Playwright, Puppeteer, crawlers |
+| productivity-workflows | Task management, calendar, scheduling, automation |
+| communication | Email, Slack, Discord, messaging, notifications |
+| documents-knowledge | PDF, DOCX, markdown, wikis, note-taking, PKM |
+| search-research | Web search, semantic search, retrieval, indexing |
+| data-analytics | ETL, visualization, spreadsheets, BI tools |
+| finance-commerce | Payments, crypto, trading, invoicing, e-commerce |
+| media-design | Image, video, audio processing, design tools, creative |
+
+### Specialized (12)
+| Category | Description |
+|----------|-------------|
+| git-version-control | GitHub, GitLab, PRs, code review, branching |
+| testing-qa | Unit tests, E2E, load testing, coverage |
+| mobile-development | React Native, Flutter, iOS, Android |
+| marketing-sales | SEO, social media, CRM, content marketing |
+| code-review-quality | Static analysis, linting, architecture checks |
+| memory-context | Conversation memory, RAG, knowledge graphs |
+| social-media | Twitter/X, Reddit, LinkedIn posting & monitoring |
+| science-research | Biology, chemistry, academic papers, citations |
+| legal-compliance | Regulations, contracts, EU AI Act, SOC2, GDPR |
+| gaming-entertainment | Game engines, media players, streaming |
+| education-learning | Tutorials, documentation generation, onboarding |
+| mcp-server | MCP protocol servers and tools |
+
+Never use "other" — if unsure, pick the closest match.
+
+## Information Extraction Priority
+
+1. **README first**: Extract name, type, install_command, example_prompts, compatible_models, platforms from README/docs
+2. **Source code second**: If README lacks info, infer from source files (package.json, SKILL.md, config files)
+3. **Never guess**: If info is truly unavailable, use empty string or empty array — don't fabricate
 
 ## Important Rules
 
