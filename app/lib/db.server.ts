@@ -8,7 +8,7 @@ import { nanoid } from "nanoid";
 export interface Env {
   DB: D1Database;
   KV: KVNamespace;
-  SCAN_QUEUE: Queue<Record<string, unknown>>;
+  SCAN_QUEUE: Queue;
   PEERY_CALLBACK_SECRET: string;
 }
 
