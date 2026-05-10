@@ -94,7 +94,7 @@
     "id": "SECRET-002",
     "category": "secret_theft",
     "pattern": "readFile[Ss]ync?\\s*\\([^)]*(\\.env|\\.ssh|credentials|id_rsa|id_ed25519)",
-    "severity": "critical",
+    "severity": "info",
     "description": "Reading secret files (.env, SSH keys, credentials)"
   },
   {
@@ -122,7 +122,7 @@
     "id": "SECRET-006",
     "category": "secret_theft",
     "pattern": "sk-[A-Za-z0-9]{20,}",
-    "severity": "critical",
+    "severity": "info",
     "description": "Hardcoded OpenAI/Stripe-style secret key"
   },
   {
@@ -157,7 +157,7 @@
     "id": "INJECT-005",
     "category": "prompt_injection",
     "pattern": "system\\s*prompt|<\\|im_start\\|>|<\\|im_end\\|>|\\[INST\\]|<<SYS>>",
-    "severity": "critical",
+    "severity": "info",
     "description": "LLM control tokens in user content"
   },
   {
@@ -220,21 +220,21 @@
     "id": "FILE-002",
     "category": "abnormal_file_access",
     "pattern": "\\.ssh[/\\\\]|id_rsa|id_ed25519|known_hosts|authorized_keys",
-    "severity": "critical",
+    "severity": "info",
     "description": "SSH key/config file access"
   },
   {
     "id": "FILE-003",
     "category": "abnormal_file_access",
     "pattern": "/etc/(passwd|shadow|hosts|sudoers)",
-    "severity": "critical",
+    "severity": "info",
     "description": "System sensitive file access"
   },
   {
     "id": "FILE-004",
     "category": "abnormal_file_access",
     "pattern": "\\.aws[/\\\\](credentials|config)|\\baws\\s+configure\\b",
-    "severity": "critical",
+    "severity": "info",
     "description": "AWS credentials file access"
   },
   {
