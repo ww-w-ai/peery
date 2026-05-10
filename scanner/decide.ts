@@ -24,27 +24,27 @@ export interface ScanDecision {
 }
 
 /**
- * Merge metadata from two LLM results, preferring Gemini as primary.
- * Falls back to DeepSeek if Gemini is null.
+ * Merge metadata from two LLM results, preferring Primary as primary.
+ * Falls back to Secondary if Primary is null.
  */
-function mergeMetadata(gemini: LLMResult | null, deepseek: LLMResult | null): LLMResult | null {
-  if (!gemini && !deepseek) return null;
-  if (!gemini) return deepseek;
-  if (!deepseek) return gemini;
+function mergeMetadata(primary: LLMResult | null, secondary: LLMResult | null): LLMResult | null {
+  if (!primary && !secondary) return null;
+  if (!primary) return secondary;
+  if (!secondary) return primary;
 
-  // Use Gemini as base, average scores
+  // Use Primary as base, average scores
   return {
-    ...gemini,
+    ...primary,
     score: {
-      usefulness: Math.round((gemini.score.usefulness + deepseek.score.usefulness) / 2),
-      documentation: Math.round((gemini.score.documentation + deepseek.score.documentation) / 2),
-      maintenance: Math.round((gemini.score.maintenance + deepseek.score.maintenance) / 2),
-      uniqueness: Math.round((gemini.score.uniqueness + deepseek.score.uniqueness) / 2),
+      usefulness: Math.round((primary.score.usefulness + secondary.score.usefulness) / 2),
+      documentation: Math.round((primary.score.documentation + secondary.score.documentation) / 2),
+      maintenance: Math.round((primary.score.maintenance + secondary.score.maintenance) / 2),
+      uniqueness: Math.round((primary.score.uniqueness + secondary.score.uniqueness) / 2),
     },
     // Merge unique items from both
-    similar_to: [...new Set([...gemini.similar_to, ...deepseek.similar_to])],
-    extends: [...new Set([...gemini.extends, ...deepseek.extends])],
-    depends_on: [...new Set([...gemini.depends_on, ...deepseek.depends_on])],
+    similar_to: [...new Set([...primary.similar_to, ...secondary.similar_to])],
+    extends: [...new Set([...primary.extends, ...secondary.extends])],
+    depends_on: [...new Set([...primary.depends_on, ...secondary.depends_on])],
   };
 }
 
@@ -55,7 +55,7 @@ export function makeDecision(
   regexResult: RegexResult,
   llmResult: DualLLMResult
 ): ScanDecision {
-  const { gemini, deepseek, errors } = llmResult;
+  const { primary, secondary, errors } = llmResult;
   const allThreats: string[] = [];
 
   // Rule 1: Regex critical = immediate fail (overrides LLM)
@@ -69,7 +69,7 @@ export function makeDecision(
       status: "fail",
       reason: `Critical pattern matches found (${regexResult.critical_count} critical)`,
       threats: allThreats,
-      metadata: mergeMetadata(gemini, deepseek),
+      metadata: mergeMetadata(primary, secondary),
       confidence: "high",
       needs_manual_review: false,
     };
@@ -86,14 +86,14 @@ export function makeDecision(
       status: "fail",
       reason: `Multiple high-severity pattern matches (${regexResult.high_count} high)`,
       threats: allThreats,
-      metadata: mergeMetadata(gemini, deepseek),
+      metadata: mergeMetadata(primary, secondary),
       confidence: "high",
       needs_manual_review: false,
     };
   }
 
   // Rule 3: Both LLMs failed to respond — cannot determine
-  if (!gemini && !deepseek) {
+  if (!primary && !secondary) {
     return {
       status: "fail",
       reason: `Both LLM checks failed: ${errors.join("; ")}`,
@@ -105,8 +105,8 @@ export function makeDecision(
   }
 
   // Rule 4: Only one LLM responded
-  if (!gemini || !deepseek) {
-    const available = gemini || deepseek!;
+  if (!primary || !secondary) {
+    const available = primary || secondary!;
     if (!available.safe) {
       allThreats.push(...available.threats);
       return {
@@ -130,44 +130,44 @@ export function makeDecision(
   }
 
   // Rule 5: Both LLMs responded — apply consensus
-  const geminiSafe = gemini.safe;
-  const deepseekSafe = deepseek.safe;
+  const primarySafe = primary.safe;
+  const secondarySafe = secondary.safe;
 
   // Both PASS → listed
-  if (geminiSafe && deepseekSafe) {
+  if (primarySafe && secondarySafe) {
     return {
       status: "pass",
       reason: "Both LLMs confirm safe",
       threats: [],
-      metadata: mergeMetadata(gemini, deepseek),
+      metadata: mergeMetadata(primary, secondary),
       confidence: "high",
       needs_manual_review: false,
     };
   }
 
   // Both FAIL → not listed
-  if (!geminiSafe && !deepseekSafe) {
-    allThreats.push(...gemini.threats.map((t) => `[Gemini] ${t}`));
-    allThreats.push(...deepseek.threats.map((t) => `[DeepSeek] ${t}`));
+  if (!primarySafe && !secondarySafe) {
+    allThreats.push(...primary.threats.map((t) => `[Primary] ${t}`));
+    allThreats.push(...secondary.threats.map((t) => `[Secondary] ${t}`));
     return {
       status: "fail",
       reason: "Both LLMs detected threats",
       threats: allThreats,
-      metadata: mergeMetadata(gemini, deepseek),
+      metadata: mergeMetadata(primary, secondary),
       confidence: "high",
       needs_manual_review: false,
     };
   }
 
   // Disagreement → conservative (not listed) + flag for manual review
-  const unsafeLLM = !geminiSafe ? gemini : deepseek;
+  const unsafeLLM = !primarySafe ? primary : secondary;
   allThreats.push(...unsafeLLM.threats.map((t) => `[Disagreement] ${t}`));
 
   return {
     status: "fail",
     reason: "LLM disagreement — conservative: not listed (flagged for review)",
     threats: allThreats,
-    metadata: mergeMetadata(gemini, deepseek),
+    metadata: mergeMetadata(primary, secondary),
     confidence: "medium",
     needs_manual_review: true,
   };

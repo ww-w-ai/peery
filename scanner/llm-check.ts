@@ -1,6 +1,6 @@
 /**
- * scanner/llm-check.ts — Dual LLM caller (Gemini + DeepSeek)
- * Design Ref: §1.2 — LLM System Prompts, §1.3 — Scanner Logic
+ * scanner/llm-check.ts — Dual LLM caller via OpenRouter
+ * Primary: DeepSeek V4-Flash | Secondary: Step-3.5-Flash
  */
 
 import type { RepoFile } from "./fetch";
@@ -33,14 +33,14 @@ export interface LLMResult {
 }
 
 export interface DualLLMResult {
-  gemini: LLMResult | null;
-  deepseek: LLMResult | null;
+  primary: LLMResult | null;
+  secondary: LLMResult | null;
   errors: string[];
 }
 
-const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
-const DEEPSEEK_MODEL = "deepseek/deepseek-chat-v4-0324";
+const PRIMARY_MODEL = "deepseek/deepseek-v4-flash";
+const SECONDARY_MODEL = "stepfun/step-3.5-flash";
 
 /**
  * Prepare the code content for LLM analysis.
@@ -67,38 +67,28 @@ interface LLMCallConfig {
   errorPrefix: string;
 }
 
-const geminiConfig = (apiKey: string): LLMCallConfig => ({
-  endpoint: `${GEMINI_ENDPOINT}?key=${apiKey}`,
-  headers: { "Content-Type": "application/json" },
-  buildBody: (systemPrompt, userContent) => ({
-    system_instruction: { parts: [{ text: systemPrompt }] },
-    contents: [{ parts: [{ text: userContent }] }],
-    generationConfig: { responseMimeType: "application/json", temperature: 0.1 },
-  }),
-  extractText: (data) => (data as { candidates?: { content?: { parts?: { text?: string }[] } }[] }).candidates?.[0]?.content?.parts?.[0]?.text,
-  errorPrefix: "Gemini",
-});
-
-const deepseekConfig = (apiKey: string): LLMCallConfig => ({
-  endpoint: OPENROUTER_ENDPOINT,
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${apiKey}`,
-    "HTTP-Referer": "https://peery.ai",
-    "X-Title": "Peery Security Scanner",
-  },
-  buildBody: (systemPrompt, userContent) => ({
-    model: DEEPSEEK_MODEL,
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userContent },
-    ],
-    temperature: 0.1,
-    response_format: { type: "json_object" },
-  }),
-  extractText: (data) => (data as { choices?: { message?: { content?: string } }[] }).choices?.[0]?.message?.content,
-  errorPrefix: "OpenRouter",
-});
+function openRouterConfig(apiKey: string, model: string, label: string): LLMCallConfig {
+  return {
+    endpoint: OPENROUTER_ENDPOINT,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://peery.ai",
+      "X-Title": "Peery Security Scanner",
+    },
+    buildBody: (systemPrompt, userContent) => ({
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userContent },
+      ],
+      temperature: 0.1,
+      response_format: { type: "json_object" },
+    }),
+    extractText: (data) => (data as { choices?: { message?: { content?: string } }[] }).choices?.[0]?.message?.content,
+    errorPrefix: label,
+  };
+}
 
 /**
  * Generic LLM caller — thin wrappers (callGemini/callDeepSeek) pass config.
@@ -130,12 +120,12 @@ async function callLLM(
   return parseAndValidateLLMResponse(text);
 }
 
-async function callGemini(codeContent: string, systemPrompt: string, apiKey: string): Promise<LLMResult> {
-  return callLLM(geminiConfig(apiKey), systemPrompt, codeContent);
+async function callPrimary(codeContent: string, systemPrompt: string, apiKey: string): Promise<LLMResult> {
+  return callLLM(openRouterConfig(apiKey, PRIMARY_MODEL, "Primary (DeepSeek V4)"), systemPrompt, codeContent);
 }
 
-async function callDeepSeek(codeContent: string, systemPrompt: string, apiKey: string): Promise<LLMResult> {
-  return callLLM(deepseekConfig(apiKey), systemPrompt, codeContent);
+async function callSecondary(codeContent: string, systemPrompt: string, apiKey: string): Promise<LLMResult> {
+  return callLLM(openRouterConfig(apiKey, SECONDARY_MODEL, "Secondary (Step 3.5)"), systemPrompt, codeContent);
 }
 
 /**
@@ -190,31 +180,30 @@ export async function runDualLLMCheck(
   files: RepoFile[],
   securityPrompt: string,
   crossCheckPrompt: string,
-  geminiKey: string,
   openRouterKey: string
 ): Promise<DualLLMResult> {
   const errors: string[] = [];
-  let gemini: LLMResult | null = null;
-  let deepseek: LLMResult | null = null;
+  let primary: LLMResult | null = null;
+  let secondary: LLMResult | null = null;
 
   const codeContent = prepareCodeContent(files);
 
-  const [geminiResult, deepseekResult] = await Promise.allSettled([
-    callGemini(codeContent, securityPrompt, geminiKey),
-    callDeepSeek(codeContent, crossCheckPrompt, openRouterKey),
+  const [primaryResult, secondaryResult] = await Promise.allSettled([
+    callPrimary(codeContent, securityPrompt, openRouterKey),
+    callSecondary(codeContent, crossCheckPrompt, openRouterKey),
   ]);
 
-  if (geminiResult.status === "fulfilled") {
-    gemini = geminiResult.value;
+  if (primaryResult.status === "fulfilled") {
+    primary = primaryResult.value;
   } else {
-    errors.push(`Gemini: ${geminiResult.reason?.message || "Unknown error"}`);
+    errors.push(`Primary: ${primaryResult.reason?.message || "Unknown error"}`);
   }
 
-  if (deepseekResult.status === "fulfilled") {
-    deepseek = deepseekResult.value;
+  if (secondaryResult.status === "fulfilled") {
+    secondary = secondaryResult.value;
   } else {
-    errors.push(`DeepSeek: ${deepseekResult.reason?.message || "Unknown error"}`);
+    errors.push(`Secondary: ${secondaryResult.reason?.message || "Unknown error"}`);
   }
 
-  return { gemini, deepseek, errors };
+  return { primary, secondary, errors };
 }

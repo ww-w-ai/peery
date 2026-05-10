@@ -27,12 +27,11 @@ async function main() {
   const sha = process.env.SCAN_SHA || undefined;
   const tag = process.env.SCAN_TAG || "";
   const callbackUrl = process.env.CALLBACK_URL;
-  const geminiKey = process.env.GEMINI_API_KEY;
   const openRouterKey = process.env.OPENROUTER_API_KEY;
   const callbackSecret = process.env.PEERY_CALLBACK_SECRET;
   const githubToken = process.env.GITHUB_TOKEN;
 
-  if (!gitUrl || !callbackUrl || !geminiKey || !openRouterKey || !callbackSecret) {
+  if (!gitUrl || !callbackUrl || !openRouterKey || !callbackSecret) {
     console.error("Missing required environment variables");
     process.exit(1);
   }
@@ -82,7 +81,6 @@ async function main() {
     files,
     securityPrompt,
     crossCheckPrompt,
-    geminiKey,
     openRouterKey
   );
 
@@ -90,8 +88,8 @@ async function main() {
     console.warn(`[Step 3] LLM errors: ${llmResult.errors.join(", ")}`);
   }
   console.log(
-    `[Step 3] Gemini: ${llmResult.gemini?.safe ? "SAFE" : "UNSAFE/NULL"}, ` +
-    `DeepSeek: ${llmResult.deepseek?.safe ? "SAFE" : "UNSAFE/NULL"}`
+    `[Step 3] Primary: ${llmResult.primary?.safe ? "SAFE" : "UNSAFE/NULL"}, ` +
+    `Secondary: ${llmResult.secondary?.safe ? "SAFE" : "UNSAFE/NULL"}`
   );
 
   // Step 4: Decision
@@ -117,8 +115,8 @@ async function main() {
     metadata: decision.metadata,
     scan_logs: [
       { scanner: "regex", result: { passed: regexResult.passed, matches: regexResult.matches.slice(0, 20) } },
-      ...(llmResult.gemini ? [{ scanner: "gemini", result: { safe: llmResult.gemini.safe, threats: llmResult.gemini.threats } }] : []),
-      ...(llmResult.deepseek ? [{ scanner: "deepseek", result: { safe: llmResult.deepseek.safe, threats: llmResult.deepseek.threats } }] : []),
+      ...(llmResult.primary ? [{ scanner: "primary", result: { safe: llmResult.primary.safe, threats: llmResult.primary.threats } }] : []),
+      ...(llmResult.secondary ? [{ scanner: "secondary", result: { safe: llmResult.secondary.safe, threats: llmResult.secondary.threats } }] : []),
     ],
   });
 
