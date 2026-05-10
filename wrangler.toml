@@ -1,6 +1,9 @@
 name = "peery"
 compatibility_date = "2025-05-01"
-pages_build_output_dir = "./build"
+main = "./workers/app.ts"
+
+[assets]
+directory = "./build/client"
 
 [vars]
 ENVIRONMENT = "production"
