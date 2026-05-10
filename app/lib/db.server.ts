@@ -10,6 +10,7 @@ export interface Env {
   KV: KVNamespace;
   SCAN_QUEUE: Queue;
   PEERY_CALLBACK_SECRET: string;
+  GITHUB_PAT: string;
 }
 
 export interface SkillRow {
