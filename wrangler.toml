@@ -8,11 +8,11 @@ ENVIRONMENT = "production"
 [[d1_databases]]
 binding = "DB"
 database_name = "peery-db"
-database_id = "placeholder-replace-after-create"
+database_id = "2addc66b-3fc2-4a7a-8f71-07ed4af22ec1"
 
 [[kv_namespaces]]
 binding = "KV"
-id = "placeholder-replace-after-create"
+id = "470273dec4df4d62953fb34179d833ad"
 
 [[queues.producers]]
 queue = "scan-jobs"
