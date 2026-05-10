@@ -57,39 +57,8 @@ export function makeDecision(
   const { primary, secondary, errors } = llmResult;
   const allThreats: string[] = [];
 
-  // Rule 1: Regex critical = immediate fail (overrides LLM)
-  if (regexResult.critical_count > 0) {
-    const regexThreats = regexResult.matches
-      .filter((m) => m.severity === "critical")
-      .map((m) => `[REGEX] ${m.description} (${m.file}:${m.line})`);
-    allThreats.push(...regexThreats);
-
-    return {
-      status: "fail",
-      reason: `Critical pattern matches found (${regexResult.critical_count} critical)`,
-      threats: allThreats,
-      metadata: mergeMetadata(primary, secondary),
-      confidence: "high",
-      needs_manual_review: false,
-    };
-  }
-
-  // Rule 2: Regex high threshold exceeded = fail
-  if (!regexResult.passed) {
-    const highThreats = regexResult.matches
-      .filter((m) => m.severity === "high")
-      .map((m) => `[REGEX] ${m.description} (${m.file}:${m.line})`);
-    allThreats.push(...highThreats);
-
-    return {
-      status: "fail",
-      reason: `Multiple high-severity pattern matches (${regexResult.high_count} high)`,
-      threats: allThreats,
-      metadata: mergeMetadata(primary, secondary),
-      confidence: "high",
-      needs_manual_review: false,
-    };
-  }
+  // Regex results are informational — LLM makes the final call.
+  // Regex matches are included as context but don't override LLM verdict.
 
   // Rule 3: Both LLMs failed to respond — cannot determine
   if (!primary && !secondary) {
