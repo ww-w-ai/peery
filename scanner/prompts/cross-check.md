@@ -55,12 +55,14 @@ Same schema as primary reviewer. Key fields:
 - **deep_review**: ~300 words. Your independent assessment of this skill's value, technology, and use cases
 - **score**: your independent ratings (may differ from primary reviewer)
 
-## Scoring Guidelines
+## Scoring Guidelines (STRICT — use the full 1-10 range, average = 5)
 
-- **usefulness** (1-10): How valuable is this to a typical developer? 1=niche/useless, 10=essential
-- **documentation** (1-10): How well-documented? 1=no docs, 10=excellent guides
-- **maintenance** (1-10): Activity, test coverage, version stability. 1=abandoned, 10=actively maintained
-- **uniqueness** (1-10): How novel? 1=many alternatives, 10=one-of-a-kind
+- **usefulness**: 1-3 toy/demo, 4-5 niche, 6-7 genuinely useful, 8-9 widely essential, 10 infrastructure-level
+- **documentation**: 1-3 no docs, 4-5 basic README, 6-7 good with examples, 8-9 comprehensive, 10 Stripe-level
+- **maintenance**: 1-3 abandoned, 4-5 occasional, 6-7 regular, 8-9 active CI/CD, 10 professional team
+- **uniqueness**: 1-3 many alternatives, 4-5 some, 6-7 few with clear diff, 8-9 novel, 10 only solution
+
+Do NOT default to 8-9. Most skills should score 5-7.
 
 ## Decision Framework
 

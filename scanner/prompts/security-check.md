@@ -68,7 +68,39 @@ You MUST respond with ONLY a valid JSON object matching this exact schema. No ma
 - **setup_complexity**: low (copy-paste), medium (config needed), high (infrastructure required)
 - **requires**: dependencies or prerequisites (e.g., "Node.js 18+", "GitHub account")
 - **highlights**: max 3 standout features (short phrases)
-- **score**: 1-10 ratings on four dimensions
+- **score**: 1-10 ratings. BE STRICT — most skills should score 5-7. Only exceptional work gets 8+.
+
+## Scoring Guidelines (STRICT)
+
+Use the full 1-10 range. Average skill = 5. Do NOT default to 8-9.
+
+**usefulness** — Would a developer actually use this regularly?
+- 1-3: Toy/demo, solves a problem nobody has
+- 4-5: Niche but functional, occasional use
+- 6-7: Genuinely useful, saves real time
+- 8-9: Widely applicable, hard to work without
+- 10: Essential infrastructure (like npm, git)
+
+**documentation** — Can someone set it up in 10 minutes?
+- 1-3: No README, or just a title
+- 4-5: Basic README, missing setup steps or examples
+- 6-7: Good README with install + usage + examples
+- 8-9: Comprehensive docs, API reference, tutorials
+- 10: Best-in-class (like Stripe docs level)
+
+**maintenance** — Is this actively maintained and reliable?
+- 1-3: No commits in 6+ months, open issues ignored
+- 4-5: Occasional updates, some issues addressed
+- 6-7: Regular commits, issues handled, tests exist
+- 8-9: Active maintenance, CI/CD, good test coverage
+- 10: Professional-grade maintenance (dedicated team)
+
+**uniqueness** — Are there alternatives?
+- 1-3: Many similar tools exist, nothing novel
+- 4-5: Some alternatives, minor differentiation
+- 6-7: Few alternatives, clear differentiator
+- 8-9: Novel approach, hard to find equivalent
+- 10: First/only solution in its category
 
 ## Categories Reference (pick 1-3, multi-tag)
 
