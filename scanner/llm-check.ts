@@ -68,7 +68,7 @@ interface LLMCallConfig {
   errorPrefix: string;
 }
 
-function openRouterConfig(apiKey: string, model: string, label: string): LLMCallConfig {
+function openRouterConfig(apiKey: string, model: string, label: string, supportsJsonFormat = true): LLMCallConfig {
   return {
     endpoint: OPENROUTER_ENDPOINT,
     headers: {
@@ -77,15 +77,20 @@ function openRouterConfig(apiKey: string, model: string, label: string): LLMCall
       "HTTP-Referer": "https://peery.ai",
       "X-Title": "Peery Security Scanner",
     },
-    buildBody: (systemPrompt, userContent) => ({
-      model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userContent },
-      ],
-      temperature: 0.1,
-      response_format: { type: "json_object" },
-    }),
+    buildBody: (systemPrompt, userContent) => {
+      const body: Record<string, unknown> = {
+        model,
+        messages: [
+          { role: "system", content: systemPrompt + "\n\nIMPORTANT: Respond with ONLY valid JSON. No markdown, no code fences, no explanation." },
+          { role: "user", content: userContent },
+        ],
+        temperature: 0.1,
+      };
+      if (supportsJsonFormat) {
+        body.response_format = { type: "json_object" };
+      }
+      return body;
+    },
     extractText: (data) => (data as { choices?: { message?: { content?: string } }[] }).choices?.[0]?.message?.content,
     errorPrefix: label,
   };
@@ -126,7 +131,7 @@ async function callPrimary(codeContent: string, systemPrompt: string, apiKey: st
 }
 
 async function callSecondary(codeContent: string, systemPrompt: string, apiKey: string): Promise<LLMResult> {
-  return callLLM(openRouterConfig(apiKey, SECONDARY_MODEL, "Secondary (Step 3.5)"), systemPrompt, codeContent);
+  return callLLM(openRouterConfig(apiKey, SECONDARY_MODEL, "Secondary (Step 3.5)", false), systemPrompt, codeContent);
 }
 
 /**
