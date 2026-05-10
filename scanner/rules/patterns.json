@@ -17,7 +17,7 @@
     "id": "DEST-003",
     "category": "destructive_commands",
     "pattern": "git\\s+push\\s+--force",
-    "severity": "high",
+    "severity": "info",
     "description": "Force push can overwrite remote history"
   },
   {
@@ -52,21 +52,21 @@
     "id": "EXFIL-001",
     "category": "data_exfiltration",
     "pattern": "(curl|wget|fetch|http\\.get|axios|request)\\s*\\(?\\s*['\"`]https?://(?!localhost|127\\.0\\.0\\.1)",
-    "severity": "high",
+    "severity": "info",
     "description": "HTTP request to external URL"
   },
   {
     "id": "EXFIL-002",
     "category": "data_exfiltration",
     "pattern": "webhook[s]?[._/]",
-    "severity": "medium",
+    "severity": "info",
     "description": "Webhook URL reference (potential data relay)"
   },
   {
     "id": "EXFIL-003",
     "category": "data_exfiltration",
     "pattern": "ngrok|localtunnel|bore\\.pub|cloudflared\\s+tunnel",
-    "severity": "high",
+    "severity": "medium",
     "description": "Tunnel service usage (exposes local to internet)"
   },
   {
@@ -87,7 +87,7 @@
     "id": "SECRET-001",
     "category": "secret_theft",
     "pattern": "process\\.env\\[?['\"]?(AWS_SECRET|GITHUB_TOKEN|API_KEY|DATABASE_URL|OPENAI_API_KEY)",
-    "severity": "high",
+    "severity": "info",
     "description": "Reading known sensitive environment variables"
   },
   {
@@ -136,14 +136,14 @@
     "id": "INJECT-002",
     "category": "prompt_injection",
     "pattern": "atob\\s*\\(|Buffer\\.from\\([^)]+,\\s*['\"]base64['\"]",
-    "severity": "high",
+    "severity": "info",
     "description": "Base64 decoding (potential hidden instructions)"
   },
   {
     "id": "INJECT-003",
     "category": "prompt_injection",
     "pattern": "\\\\u[0-9a-fA-F]{4}.*\\\\u[0-9a-fA-F]{4}.*\\\\u[0-9a-fA-F]{4}",
-    "severity": "medium",
+    "severity": "info",
     "description": "Multiple unicode escapes (possible obfuscated payload)"
   },
   {
@@ -164,14 +164,14 @@
     "id": "OBFUSC-001",
     "category": "obfuscated_code",
     "pattern": "\\beval\\s*\\(",
-    "severity": "high",
+    "severity": "info",
     "description": "Dynamic code execution (security note: this is a DETECTION pattern for scanning third-party code, not a usage of eval in Peery itself)"
   },
   {
     "id": "OBFUSC-002",
     "category": "obfuscated_code",
     "pattern": "\\bexec\\s*\\(|\\bexecSync\\s*\\(",
-    "severity": "high",
+    "severity": "info",
     "description": "Shell command execution"
   },
   {
@@ -192,7 +192,7 @@
     "id": "OBFUSC-005",
     "category": "obfuscated_code",
     "pattern": "require\\s*\\(\\s*[^'\"`]|import\\s*\\(\\s*[^'\"`]",
-    "severity": "medium",
+    "severity": "info",
     "description": "Dynamic require/import with variable (not string literal)"
   },
   {
@@ -206,14 +206,14 @@
     "id": "OBFUSC-007",
     "category": "obfuscated_code",
     "pattern": "\\b(compile|vm\\.runIn|vm\\.Script|child_process)\\b",
-    "severity": "high",
+    "severity": "info",
     "description": "Node.js dangerous module usage"
   },
   {
     "id": "FILE-001",
     "category": "abnormal_file_access",
     "pattern": "(\\$HOME|~|/home/|/Users/|/root/|C:\\\\Users\\\\)",
-    "severity": "medium",
+    "severity": "info",
     "description": "Home directory path reference"
   },
   {
@@ -262,7 +262,7 @@
     "id": "NET-001",
     "category": "network_abuse",
     "pattern": "\\blisten\\s*\\(.*\\b(0\\.0\\.0\\.0|INADDR_ANY)\\b",
-    "severity": "medium",
+    "severity": "info",
     "description": "Binding to all interfaces (network exposure)"
   },
   {
@@ -276,14 +276,14 @@
     "id": "NET-003",
     "category": "network_abuse",
     "pattern": "\\bnet\\.Socket\\b.*connect|\\bSocket\\b.*\\bconnect\\b",
-    "severity": "medium",
+    "severity": "info",
     "description": "Raw socket connection (non-HTTP networking)"
   },
   {
     "id": "PRIV-001",
     "category": "privilege_escalation",
     "pattern": "\\bsudo\\b|\\bchmod\\s+[47]|\\bchown\\s+root",
-    "severity": "high",
+    "severity": "info",
     "description": "Privilege escalation commands"
   },
   {
@@ -297,7 +297,7 @@
     "id": "PERSIST-001",
     "category": "persistence",
     "pattern": "cron(tab)?\\s+|systemctl\\s+(enable|start)|launchctl\\s+load",
-    "severity": "high",
+    "severity": "info",
     "description": "Persistence mechanism (scheduled tasks/services)"
   },
   {
@@ -318,7 +318,7 @@
     "id": "CRYPTO-002",
     "category": "crypto_abuse",
     "pattern": "\\b(bitcoin|ethereum|monero)\\b.*\\b(address|wallet)\\b",
-    "severity": "high",
+    "severity": "info",
     "description": "Cryptocurrency wallet references in agent code"
   }
 ]

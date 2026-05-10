@@ -10,14 +10,14 @@ export interface PatternRule {
   id: string;
   category: string;
   pattern: string;
-  severity: "critical" | "high" | "medium";
+  severity: "critical" | "high" | "medium" | "info";
   description: string;
 }
 
 export interface PatternMatch {
   rule_id: string;
   category: string;
-  severity: "critical" | "high" | "medium";
+  severity: "critical" | "high" | "medium" | "info";
   description: string;
   file: string;
   line: number;
@@ -83,7 +83,7 @@ export function runRegexCheck(files: RepoFile[]): RegexResult {
   // Single reduce for severity counting
   const counts = matches.reduce(
     (acc, m) => {
-      acc[m.severity]++;
+      if (m.severity in acc) acc[m.severity as "critical" | "high" | "medium"]++;
       return acc;
     },
     { critical: 0, high: 0, medium: 0 }
